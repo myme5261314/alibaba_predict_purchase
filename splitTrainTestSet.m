@@ -13,8 +13,9 @@ origin_data(:, 4) = origin_data(:, 4) - min( origin_data(:,4)) + 1;
 sorted_data = sortrows(origin_data, 4);
 %   split the data record by whether it's record time is not less than 90
 %   days. And extract the 1-90 days' data and the 91-122 days' data.
-train_data = sorted_data(sorted_data(:,4)<=90, :);
-test_data = sorted_data(sorted_data(:,4)>90, :);
+split_days = 60;
+train_data = sorted_data(sorted_data(:,4)<=split_days, :);
+test_data = sorted_data(sorted_data(:,4)>split_days, :);
 train_set = sortrows( train_data, [1 2 4] );
 test_set = sortrows( test_data, [1 2 4]);
 

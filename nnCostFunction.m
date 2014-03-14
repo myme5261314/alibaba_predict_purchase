@@ -5,7 +5,7 @@ function [J grad] = nnCostFunction(nn_params, ...
                                    X, y, lambda)
 %NNCOSTFUNCTION Implements the neural network cost function for a two layer
 %neural network which performs classification
-%   [J grad] = NNCOSTFUNCTON(nn_params, hidden_layer_size, output_layer_size, ...
+%   [J grad] = NNCOSTFUNCTON(nn_params, hidden_layer_size, num_labels, ...
 %   X, y, lambda) computes the cost and gradient of the neural network. The
 %   parameters for the neural network are "unrolled" into the vector
 %   nn_params and need to be converted back into the weight matrices. 
@@ -27,8 +27,8 @@ m = size(X, 1);
          
 % You need to return the following variables correctly 
 J = 0;
-% Theta1_grad = zeros(size(Theta1));
-% Theta2_grad = zeros(size(Theta2));
+Theta1_grad = zeros(size(Theta1));
+Theta2_grad = zeros(size(Theta2));
 
 % ====================== YOUR CODE HERE ======================
 % Instructions: You should complete the code by working through the
@@ -61,12 +61,11 @@ J = 0;
 %               the regularization separately and then add them to Theta1_grad
 %               and Theta2_grad from Part 2.
 %
-% Y_trans = zeros(m, output_layer_size);
-% for i = 1:output_layer_size
-% 	pos = find( y==i );
-% 	Y_trans(pos,i) = 1;
-% end
-Y_trans = y;
+Y_trans = zeros(m, output_layer_size);
+for i = 1:output_layer_size
+	pos = find( y==i );
+	Y_trans(pos,i) = 1;
+end
 X = [ ones(m,1) X ];
 Z2 = Theta1 * X';
 
@@ -76,12 +75,7 @@ Z2 = [ ones(1,size(Z2,2)) ; Z2 ];
 hx = sigmf( Theta2 * A2, [1 0] );
 
 J = sum(sum( Y_trans .* log(hx)' + (1-Y_trans) .* log(1-hx)' ))/-m;
-temp1 = Theta1(:,2:end).^2;
-temp1 = sum(sum(temp1));
-temp2 = Theta2(:,2:end).^2;
-temp2 = sum(sum(temp2));
-J = J + (temp1 + temp2)*lambda/2/m;
-% J = J + ( sum(sum(Theta1(:,2:end).^2)) + sum(sum(Theta2(:,2:end).^2)) )*lambda/2/m;
+J = J + ( sum(sum(Theta1(:,2:end).^2)) + sum(sum(Theta2(:,2:end).^2)) )*lambda/2/m;
 
 delta3 = hx - Y_trans';
 delta2 = Theta2'*delta3 .* sigmoidGradient(Z2);
@@ -89,10 +83,8 @@ delta2 = Theta2'*delta3 .* sigmoidGradient(Z2);
 delta2 = delta2(2:end,:);
 %delta3 = delta3(2:end);
 
-% Theta1_grad = (Theta1_grad + delta2*X)/m;
-% Theta2_grad = (Theta2_grad + delta3*A2')/m;
-Theta1_grad = delta2*X/m;
-Theta2_grad = delta3*A2'/m;
+Theta1_grad = (Theta1_grad + delta2*X)/m;
+Theta2_grad = (Theta2_grad + delta3*A2')/m;
 
 Theta1_grad(:,2:end) = Theta1_grad(:,2:end) + lambda/m * Theta1(:,2:end);
 Theta2_grad(:,2:end) = Theta2_grad(:,2:end) + lambda/m * Theta2(:,2:end);

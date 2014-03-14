@@ -19,6 +19,7 @@ for i = 1:length(user_brand_keys)
 end
 X = extractFeatures(:,1:5);
 Y = extractFeatures(:,6);
+% Y(Y>=1) = 1;
 
 end
 
